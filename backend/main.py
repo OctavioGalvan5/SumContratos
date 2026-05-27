@@ -9,7 +9,7 @@ import uuid
 
 from database import engine, Base, get_db
 import models, schemas
-from minio_client import init_minio, upload_file_to_minio, get_file_url
+from minio_client import init_minio, upload_file_to_minio, get_file_url, delete_file_from_minio
 from config import settings
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -153,13 +153,46 @@ def get_contratos(db: Session = Depends(get_db), _token: str = Depends(verify_to
     return contratos
 
 @app.put("/api/contratos/{contrato_id}", response_model=schemas.ContratoResponse)
-def update_contrato(contrato_id: str, data: schemas.ContratoUpdate, db: Session = Depends(get_db), _token: str = Depends(verify_token)):
+async def update_contrato(
+    contrato_id: str,
+    titular: str = Form(None),
+    categoria_id: str = Form(None),
+    fecha_inicio: date = Form(None),
+    fecha_vencimiento: date = Form(None),
+    observaciones: str = Form(None),
+    dias_aviso_alarma: int = Form(None),
+    clear_file: str = Form(None),
+    file: UploadFile = File(None),
+    db: Session = Depends(get_db),
+    _token: str = Depends(verify_token)
+):
     contrato = db.query(models.Contrato).filter(models.Contrato.id == contrato_id).first()
     if not contrato:
         raise HTTPException(status_code=404, detail="Contrato no encontrado")
-    update_data = data.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(contrato, field, value)
+
+    if titular is not None:           contrato.titular = titular
+    if fecha_inicio is not None:      contrato.fecha_inicio = fecha_inicio
+    if fecha_vencimiento is not None: contrato.fecha_vencimiento = fecha_vencimiento
+    if observaciones is not None:     contrato.observaciones = observaciones or None
+    if dias_aviso_alarma is not None: contrato.dias_aviso_alarma = dias_aviso_alarma
+
+    if categoria_id is not None:
+        try:
+            contrato.categoria_id = uuid.UUID(categoria_id) if categoria_id else None
+        except Exception:
+            contrato.categoria_id = None
+
+    if clear_file == "true":
+        if contrato.archivo_path:
+            delete_file_from_minio(contrato.archivo_path)
+        contrato.archivo_path = None
+    elif file and file.filename:
+        file_ext = os.path.splitext(file.filename)[1]
+        file_name = f"contrato_{contrato.id}{file_ext}"
+        content = await file.read()
+        if upload_file_to_minio(file_name, content, file.content_type):
+            contrato.archivo_path = file_name
+
     db.commit()
     db.refresh(contrato)
     return contrato

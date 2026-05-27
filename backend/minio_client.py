@@ -31,6 +31,14 @@ def upload_file_to_minio(file_name: str, file_data: bytes, content_type: str):
         print(f"Minio upload error: {e}")
         return False
 
+def delete_file_from_minio(file_name: str):
+    try:
+        minio_client.remove_object(settings.MINIO_BUCKET_NAME, file_name)
+        return True
+    except S3Error as e:
+        print(f"Minio delete error: {e}")
+        return False
+
 def get_file_url(file_name: str):
     try:
         # Generates a presigned URL valid for 1 hour
