@@ -99,12 +99,12 @@ export default function Dashboard() {
             const fVenc = new Date(c.fecha_vencimiento);
             const isVencido = c.estado === 'Vencido' || fVenc < new Date();
             return (
-              <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{c.titular}</p>
+              <div key={i} className="px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{c.titular}</p>
                   <p className="text-xs text-gray-500 mt-1">{c.categoria?.nombre || 'Sin categoría'}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <p className={`text-sm font-semibold ${isVencido ? 'text-red-600' : 'text-gray-900'}`}>
                     {format(fVenc, 'dd/MM/yyyy')}
                   </p>

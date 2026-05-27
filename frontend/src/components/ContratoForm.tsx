@@ -72,7 +72,7 @@ export default function ContratoForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Registrar Nuevo Contrato</h2>
       
       {successMsg && (
@@ -81,7 +81,7 @@ export default function ContratoForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-8 space-y-6">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
@@ -187,11 +187,11 @@ export default function ContratoForm() {
           </div>
         </div>
 
-        <div className="pt-4 flex justify-end">
+        <div className="pt-4 flex justify-end sm:justify-end">
           <button 
             type="submit" 
             disabled={loading}
-            className="flex items-center px-6 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto flex items-center justify-center px-6 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 transition-colors disabled:opacity-50"
           >
             {loading ? 'Guardando...' : (
               <>
