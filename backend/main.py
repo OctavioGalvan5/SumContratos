@@ -18,6 +18,16 @@ from apscheduler.triggers.cron import CronTrigger
 # Crear tablas
 Base.metadata.create_all(bind=engine)
 
+# Migración: agregar columna bloqueado si no existe
+with engine.connect() as conn:
+    try:
+        conn.execute(__import__('sqlalchemy').text(
+            "ALTER TABLE contratos ADD COLUMN IF NOT EXISTS bloqueado BOOLEAN DEFAULT FALSE"
+        ))
+        conn.commit()
+    except Exception:
+        pass
+
 app = FastAPI(title="Caja Abogados - Contratos API")
 
 # Inicializar Minio al arrancar
@@ -28,7 +38,7 @@ def revisar_vencimientos():
     db = next(get_db())
     hoy = date.today()
     
-    contratos = db.query(models.Contrato).filter(models.Contrato.estado == "Activo").all()
+    contratos = db.query(models.Contrato).filter(models.Contrato.estado == "Activo", models.Contrato.bloqueado == False).all()
     
     for c in contratos:
         dias_restantes = (c.fecha_vencimiento - hoy).days
@@ -141,6 +151,15 @@ def get_contratos(db: Session = Depends(get_db), _token: str = Depends(verify_to
     # No inyectamos las URLs de minio directamente aquí para evitar regenerarlas todas
     # El frontend pedirá el archivo al endpoint /api/contratos/{id}/archivo
     return contratos
+
+@app.put("/api/contratos/{contrato_id}/toggle-bloqueo")
+def toggle_bloqueo_contrato(contrato_id: str, db: Session = Depends(get_db), _token: str = Depends(verify_token)):
+    contrato = db.query(models.Contrato).filter(models.Contrato.id == contrato_id).first()
+    if not contrato:
+        raise HTTPException(status_code=404, detail="Contrato no encontrado")
+    contrato.bloqueado = not contrato.bloqueado
+    db.commit()
+    return {"bloqueado": contrato.bloqueado}
 
 @app.get("/api/contratos/{contrato_id}/archivo")
 def get_contrato_archivo(contrato_id: str, db: Session = Depends(get_db), _token: str = Depends(verify_token)):

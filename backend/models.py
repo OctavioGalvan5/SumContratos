@@ -22,6 +22,7 @@ class Contrato(Base):
     observaciones = Column(Text, nullable=True)
     dias_aviso_alarma = Column(Integer, default=30)
     estado = Column(String, default="Activo")
+    bloqueado = Column(Boolean, default=False)
 
     categoria = relationship("Categoria")
     notificaciones = relationship("Notificacion", back_populates="contrato", cascade="all, delete-orphan")

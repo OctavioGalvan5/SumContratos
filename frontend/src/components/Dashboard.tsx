@@ -24,11 +24,13 @@ export default function Dashboard() {
         const hoy = new Date();
 
         contratos.forEach(c => {
-          if (c.estado === 'Vencido') {
+          if (c.bloqueado) return;
+          const fVenc = new Date(c.fecha_vencimiento);
+          const isVencido = c.estado === 'Vencido' || fVenc < hoy;
+          if (isVencido) {
             vencidos++;
           } else {
             activos++;
-            const fVenc = new Date(c.fecha_vencimiento);
             const diff = differenceInDays(fVenc, hoy);
             if (diff >= 0 && diff <= 30) {
               porVencer++;
@@ -38,8 +40,10 @@ export default function Dashboard() {
 
         setStats({ activos, porVencer, vencidos });
         
-        // Sort by expiration date
-        const sorted = [...contratos].sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+        // Sort by expiration date, exclude blocked
+        const sorted = [...contratos]
+          .filter(c => !c.bloqueado)
+          .sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
         setRecientes(sorted.slice(0, 5));
       } catch (e) {
         console.error(e);

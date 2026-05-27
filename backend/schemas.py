@@ -25,6 +25,7 @@ class ContratoBase(BaseModel):
     observaciones: Optional[str] = None
     dias_aviso_alarma: int = 30
     estado: str = "Activo"
+    bloqueado: bool = False
 
 class ContratoCreate(ContratoBase):
     pass

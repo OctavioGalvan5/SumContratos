@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, Lock, Unlock, EyeOff } from 'lucide-react';
 
 export default function ContratosList() {
   const [contratos, setContratos] = useState([]);
   const [search, setSearch] = useState('');
+  const [mostrarBloqueados, setMostrarBloqueados] = useState(false);
 
   useEffect(() => {
     fetchContratos();
@@ -30,24 +31,53 @@ export default function ContratosList() {
     }
   };
 
-  const filtered = contratos.filter(c => 
-    c.titular.toLowerCase().includes(search.toLowerCase()) ||
-    (c.categoria && c.categoria.nombre.toLowerCase().includes(search.toLowerCase()))
-  );
+  const handleToggleBloqueo = async (id) => {
+    try {
+      await axios.put(`/api/contratos/${id}/toggle-bloqueo`);
+      fetchContratos();
+    } catch (e) {
+      alert("No se pudo cambiar el estado del contrato.");
+    }
+  };
+
+  const bloqueadosCount = contratos.filter(c => c.bloqueado).length;
+
+  const filtered = contratos.filter(c => {
+    if (c.bloqueado && !mostrarBloqueados) return false;
+    return (
+      c.titular.toLowerCase().includes(search.toLowerCase()) ||
+      (c.categoria && c.categoria.nombre.toLowerCase().includes(search.toLowerCase()))
+    );
+  });
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Lista de Contratos</h2>
-        <div className="relative">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input 
-            type="text" 
-            placeholder="Buscar..." 
-            className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 w-64"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="flex items-center gap-3">
+          {bloqueadosCount > 0 && (
+            <button
+              onClick={() => setMostrarBloqueados(!mostrarBloqueados)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors
+                ${mostrarBloqueados
+                  ? 'bg-gray-100 border-gray-300 text-gray-700'
+                  : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300'}`}
+              title={mostrarBloqueados ? 'Ocultar deshabilitados' : 'Mostrar deshabilitados'}
+            >
+              <EyeOff className="w-4 h-4" />
+              {mostrarBloqueados ? 'Ocultar deshabilitados' : `Mostrar deshabilitados (${bloqueadosCount})`}
+            </button>
+          )}
+          <div className="relative">
+            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar..."
+              className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 w-64"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -61,41 +91,57 @@ export default function ContratosList() {
               <th className="px-6 py-4 font-medium">F. Vencimiento</th>
               <th className="px-6 py-4 font-medium">Estado</th>
               <th className="px-6 py-4 font-medium text-center">Archivo</th>
+              <th className="px-6 py-4 font-medium text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.map((c) => (
-              <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-4 font-medium text-gray-900">{c.titular}</td>
-                <td className="px-6 py-4 text-gray-500 text-sm">{c.categoria?.nombre || '-'}</td>
-                <td className="px-6 py-4 text-gray-500 text-sm">{format(new Date(c.fecha_inicio), 'dd/MM/yyyy')}</td>
-                <td className="px-6 py-4 text-gray-500 text-sm">{format(new Date(c.fecha_vencimiento), 'dd/MM/yyyy')}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium
-                    ${c.estado === 'Activo' ? 'bg-green-100 text-green-700' : ''}
-                    ${c.estado === 'Vencido' ? 'bg-red-100 text-red-700' : ''}
-                  `}>
-                    {c.estado}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  {c.archivo_path ? (
-                    <button 
-                      onClick={() => handleDownload(c.id)}
-                      className="text-primary-600 hover:text-primary-800 transition-colors inline-flex items-center"
-                      title="Descargar/Ver Archivo"
+            {filtered.map((c) => {
+              const fVenc = new Date(c.fecha_vencimiento);
+              const isVencido = !c.bloqueado && (c.estado === 'Vencido' || fVenc < new Date());
+              const estadoMostrar = c.bloqueado ? 'Deshabilitado' : (isVencido ? 'Vencido' : 'Activo');
+              return (
+                <tr key={c.id} className={`hover:bg-gray-50/50 transition-colors ${c.bloqueado ? 'opacity-50' : ''}`}>
+                  <td className="px-6 py-4 font-medium text-gray-900">{c.titular}</td>
+                  <td className="px-6 py-4 text-gray-500 text-sm">{c.categoria?.nombre || '-'}</td>
+                  <td className="px-6 py-4 text-gray-500 text-sm">{format(new Date(c.fecha_inicio), 'dd/MM/yyyy')}</td>
+                  <td className="px-6 py-4 text-gray-500 text-sm">{format(new Date(c.fecha_vencimiento), 'dd/MM/yyyy')}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium
+                      ${estadoMostrar === 'Activo' ? 'bg-green-100 text-green-700' : ''}
+                      ${estadoMostrar === 'Vencido' ? 'bg-red-100 text-red-700' : ''}
+                      ${estadoMostrar === 'Deshabilitado' ? 'bg-gray-100 text-gray-500' : ''}
+                    `}>
+                      {estadoMostrar}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    {c.archivo_path ? (
+                      <button
+                        onClick={() => handleDownload(c.id)}
+                        className="text-primary-600 hover:text-primary-800 transition-colors inline-flex items-center"
+                        title="Descargar/Ver Archivo"
+                      >
+                        <Download className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <span className="text-gray-300 text-sm">-</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => handleToggleBloqueo(c.id)}
+                      className={`transition-colors inline-flex items-center ${c.bloqueado ? 'text-gray-400 hover:text-green-600' : 'text-gray-400 hover:text-red-600'}`}
+                      title={c.bloqueado ? 'Habilitar contrato' : 'Deshabilitar contrato'}
                     >
-                      <Download className="w-5 h-5" />
+                      {c.bloqueado ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
                     </button>
-                  ) : (
-                    <span className="text-gray-300 text-sm">-</span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              );
+            })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
                   No se encontraron contratos.
                 </td>
               </tr>
