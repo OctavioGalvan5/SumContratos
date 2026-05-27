@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Hea
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from typing import List
 import os
 import uuid
@@ -151,6 +151,18 @@ def get_contratos(db: Session = Depends(get_db), _token: str = Depends(verify_to
     # No inyectamos las URLs de minio directamente aquí para evitar regenerarlas todas
     # El frontend pedirá el archivo al endpoint /api/contratos/{id}/archivo
     return contratos
+
+@app.put("/api/contratos/{contrato_id}", response_model=schemas.ContratoResponse)
+def update_contrato(contrato_id: str, data: schemas.ContratoUpdate, db: Session = Depends(get_db), _token: str = Depends(verify_token)):
+    contrato = db.query(models.Contrato).filter(models.Contrato.id == contrato_id).first()
+    if not contrato:
+        raise HTTPException(status_code=404, detail="Contrato no encontrado")
+    update_data = data.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(contrato, field, value)
+    db.commit()
+    db.refresh(contrato)
+    return contrato
 
 @app.put("/api/contratos/{contrato_id}/toggle-bloqueo")
 def toggle_bloqueo_contrato(contrato_id: str, db: Session = Depends(get_db), _token: str = Depends(verify_token)):

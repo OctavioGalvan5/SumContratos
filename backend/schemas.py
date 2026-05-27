@@ -30,6 +30,15 @@ class ContratoBase(BaseModel):
 class ContratoCreate(ContratoBase):
     pass
 
+class ContratoUpdate(BaseModel):
+    titular: Optional[str] = None
+    categoria_id: Optional[UUID4] = None
+    fecha_inicio: Optional[date] = None
+    fecha_vencimiento: Optional[date] = None
+    observaciones: Optional[str] = None
+    dias_aviso_alarma: Optional[int] = None
+    estado: Optional[str] = None
+
 class ContratoResponse(ContratoBase):
     id: UUID4
     archivo_path: Optional[str] = None
