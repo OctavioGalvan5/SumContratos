@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+asyncpg
+minio
+apscheduler
+python-multipart
+pydantic-settings
+alembic

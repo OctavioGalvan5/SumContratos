@@ -3,6 +3,10 @@
 .env.*
 !.env.example
 
+# Bases de datos locales
+*.db
+*.sqlite3
+
 # Python
 backend/venv/
 backend/__pycache__/
