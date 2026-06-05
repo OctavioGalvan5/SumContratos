@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState } from 'react';
 import axios from 'axios';
+import logoUrl from '../assets/logo.svg';
 
 export default function Login({ setAuth }) {
   const [password, setPassword] = useState('');
@@ -25,7 +26,7 @@ export default function Login({ setAuth }) {
     <div className="min-h-screen bg-bg-gray flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-100 p-8">
         <div className="flex justify-center mb-8">
-          <img src="/logo.svg" alt="Caja de Abogados de Salta" className="h-16 w-auto" />
+          <img src={logoUrl} alt="Caja de Abogados de Salta" className="h-16 w-auto" />
         </div>
         
         {error && (

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import logoUrl from './assets/logo.svg';
 import { 
   Bell, Home, FileText, PlusCircle, Calendar as CalendarIcon, Tags, Menu, X,
   BookOpen, Users, UserCheck, ClipboardList, DollarSign, BarChart3, CalendarRange
@@ -89,13 +90,13 @@ function App() {
           md:relative md:translate-x-0 md:flex shrink-0
         `}>
           <div className="h-16 flex items-center justify-between border-b border-brand-teal-mid px-3">
-            <img src="/logo.svg" alt="Caja de Abogados" className="h-10 w-auto" />
+            <img src={logoUrl} alt="Caja de Abogados" className="h-10 w-auto" />
             <button onClick={closeSidebar} className="md:hidden p-1 rounded hover:bg-white/10 text-white/80 shrink-0">
               <X className="w-5 h-5 text-white" />
             </button>
           </div>
           
-          <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+          <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto sidebar-nav">
             {/* Sección Contratos */}
             <div>
               <div className="px-3 mb-2.5 text-[10px] font-bold text-teal-200/50 uppercase tracking-widest">
@@ -192,7 +193,7 @@ function App() {
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
-              <img src="/logo.svg" alt="Caja de Abogados de Salta" className="h-10 w-auto" />
+              <img src={logoUrl} alt="Caja de Abogados de Salta" className="h-10 w-auto" />
             </div>
             <div className="relative">
               <button
