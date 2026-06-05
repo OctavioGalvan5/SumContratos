@@ -88,9 +88,9 @@ function App() {
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           md:relative md:translate-x-0 md:flex shrink-0
         `}>
-          <div className="h-16 flex items-center justify-between border-b border-brand-teal-mid px-4">
-            <h1 className="text-sm font-black text-white tracking-wider uppercase leading-tight">Caja de Abogados</h1>
-            <button onClick={closeSidebar} className="md:hidden p-1 rounded hover:bg-white/10 text-white/80">
+          <div className="h-16 flex items-center justify-between border-b border-brand-teal-mid px-3">
+            <img src="/logo.svg" alt="Caja de Abogados" className="h-10 w-auto" />
+            <button onClick={closeSidebar} className="md:hidden p-1 rounded hover:bg-white/10 text-white/80 shrink-0">
               <X className="w-5 h-5 text-white" />
             </button>
           </div>
@@ -192,7 +192,7 @@ function App() {
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
-              <h2 className="text-base md:text-lg font-bold text-slate-800 tracking-wide uppercase">Caja de Abogados de Salta</h2>
+              <img src="/logo.svg" alt="Caja de Abogados de Salta" className="h-10 w-auto" />
             </div>
             <div className="relative">
               <button
