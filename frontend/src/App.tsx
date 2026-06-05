@@ -19,6 +19,7 @@ import Login from './components/Login';
 // Componentes SUM
 import DashboardSum from './components/sum/DashboardSum';
 import Cursos from './components/sum/Cursos';
+import CursoDetalle from './components/sum/CursoDetalle';
 import HorarioSemanal from './components/sum/HorarioSemanal';
 import Personas from './components/sum/Personas';
 import Inscripciones from './components/sum/Inscripciones';
@@ -232,6 +233,7 @@ function App() {
               {/* SUM */}
               <Route path="/sum" element={<DashboardSum />} />
               <Route path="/sum/cursos" element={<Cursos />} />
+              <Route path="/sum/cursos/:id" element={<CursoDetalle />} />
               <Route path="/sum/horarios" element={<HorarioSemanal />} />
               <Route path="/sum/personas" element={<Personas />} />
               <Route path="/sum/inscripciones" element={<Inscripciones />} />

@@ -1,6 +1,7 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
-import { Search, Plus, Trash2, Edit2, BookOpen, Clock, Calendar, Check, X, ShieldAlert } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Search, Plus, Trash2, Edit2, BookOpen, Clock, Calendar, Check, X, ShieldAlert, ChevronRight, RefreshCw } from 'lucide-react';
 import axios from 'axios';
 
 const DIAS = [
@@ -14,11 +15,20 @@ const DIAS = [
 ];
 
 export default function Cursos() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  
+
+  // Para detectar cambio de precio al editar
+  const originalPrecioRef = useRef(null);
+  const [priceChangedForId, setPriceChangedForId] = useState(null);
+  const [showPriceDialog, setShowPriceDialog] = useState(false);
+  const [updatingCuotas, setUpdatingCuotas] = useState(false);
+
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -70,6 +80,15 @@ export default function Cursos() {
     fetchCursos();
     fetchProfesores();
   }, []);
+
+  // Abrir formulario de edición si se navega desde CursoDetalle
+  useEffect(() => {
+    if (location.state?.editId && cursos.length > 0) {
+      const curso = cursos.find(c => c.id === location.state.editId);
+      if (curso) handleEditClick(curso);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state, cursos]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -141,6 +160,7 @@ export default function Cursos() {
   };
 
   const handleEditClick = (curso) => {
+    originalPrecioRef.current = parseFloat(curso.costo_mensual_particular);
     setFormData({
       nombre: curso.nombre,
       descripcion: curso.descripcion || '',
@@ -185,7 +205,13 @@ export default function Cursos() {
     try {
       if (editingId) {
         await axios.put(`/api/cursos/${editingId}`, body);
-        setSuccessMsg('Curso actualizado correctamente.');
+        const nuevoPrecio = parseFloat(formData.costo_mensual_particular);
+        if (originalPrecioRef.current !== null && nuevoPrecio !== originalPrecioRef.current) {
+          setPriceChangedForId(editingId);
+          setShowPriceDialog(true);
+        } else {
+          setSuccessMsg('Curso actualizado correctamente.');
+        }
       } else {
         await axios.post('/api/cursos/', body);
         setSuccessMsg('Curso creado correctamente, y clases programadas generadas.');
@@ -210,12 +236,71 @@ export default function Cursos() {
     }
   };
 
-  const filteredCursos = cursos.filter(c => 
+  const handleActualizarCuotas = async () => {
+    if (!priceChangedForId) return;
+    setUpdatingCuotas(true);
+    try {
+      const res = await axios.patch(`/api/cursos/${priceChangedForId}/actualizar-cuotas-pendientes`);
+      setSuccessMsg(`Curso actualizado. ${res.data.actualizadas} cuota(s) pendiente(s) ajustadas al nuevo precio.`);
+    } catch (e) {
+      setSuccessMsg('Curso actualizado correctamente.');
+    } finally {
+      setUpdatingCuotas(false);
+      setShowPriceDialog(false);
+      setPriceChangedForId(null);
+    }
+  };
+
+  const handleSkipActualizarCuotas = () => {
+    setSuccessMsg('Curso actualizado. Las cuotas pendientes existentes mantienen el precio anterior.');
+    setShowPriceDialog(false);
+    setPriceChangedForId(null);
+  };
+
+  const filteredCursos = cursos.filter(c =>
     c.nombre.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
+
+      {/* Diálogo: cambio de precio */}
+      {showPriceDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-200">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-amber-50 rounded-lg shrink-0">
+                <RefreshCw className="w-5 h-5 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800">El precio del curso cambió</h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Hay cuotas <strong>pendientes de pago</strong> generadas con el precio anterior.
+                  ¿Querés actualizarlas al nuevo precio?
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleSkipActualizarCuotas}
+                className="flex-1 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                No, dejar precio anterior
+              </button>
+              <button
+                onClick={handleActualizarCuotas}
+                disabled={updatingCuotas}
+                className="flex-1 py-2 bg-brand-teal text-white rounded-lg text-sm font-medium hover:bg-brand-teal-mid transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {updatingCuotas ? (
+                  <><RefreshCw className="w-4 h-4 animate-spin" /> Actualizando...</>
+                ) : 'Sí, actualizar cuotas'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-brand-teal">Gestión de Cursos</h1>
@@ -477,11 +562,18 @@ export default function Cursos() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
             {filteredCursos.map((c) => (
-              <div key={c.id} className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 hover:border-slate-350 transition-colors flex flex-col justify-between">
+              <div
+                key={c.id}
+                onClick={() => navigate(`/sum/cursos/${c.id}`)}
+                className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 hover:border-brand-teal/30 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
+              >
                 <div>
                   <div className="flex justify-between items-start gap-2">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-800">{c.nombre}</h3>
+                      <h3 className="text-lg font-bold text-slate-800 group-hover:text-brand-teal transition-colors flex items-center gap-1">
+                        {c.nombre}
+                        <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      </h3>
                       {c.descripcion && <p className="text-xs text-slate-500 mt-1">{c.descripcion}</p>}
                     </div>
                     {c.activo ? (
@@ -541,14 +633,14 @@ export default function Cursos() {
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEditClick(c)}
+                      onClick={(e) => { e.stopPropagation(); handleEditClick(c); }}
                       className="p-2 bg-white border border-slate-250 hover:bg-brand-teal-dim hover:text-brand-teal hover:border-brand-teal/20 text-slate-500 rounded-lg transition-all cursor-pointer"
                       title="Editar"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(c.id)}
+                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(c.id); }}
                       className="p-2 bg-red-50 border border-red-200 hover:bg-red-100 text-red-650 rounded-lg transition-all cursor-pointer"
                       title="Eliminar"
                     >

@@ -153,6 +153,36 @@ def update_curso(
         
     return db_curso
 
+@router.patch("/cursos/{curso_id}/actualizar-cuotas-pendientes")
+def actualizar_cuotas_pendientes(
+    curso_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    _token: str = Depends(verify_token)
+):
+    curso = db.query(models.Curso).filter(models.Curso.id == curso_id).first()
+    if not curso:
+        raise HTTPException(status_code=404, detail="Curso no encontrado")
+
+    cuotas_pendientes = db.query(models.CuotaPago).filter(
+        models.CuotaPago.curso_id == curso_id,
+        models.CuotaPago.estado == "Pendiente"
+    ).all()
+
+    nuevo_precio = float(curso.costo_mensual_particular)
+    actualizadas = 0
+
+    for cuota in cuotas_pendientes:
+        inscripcion = db.query(models.Inscripcion).filter(
+            models.Inscripcion.curso_id == curso_id,
+            models.Inscripcion.alumno_id == cuota.alumno_id
+        ).first()
+        descuento = float(inscripcion.descuento_porcentaje) if inscripcion and inscripcion.descuento_porcentaje else 0.0
+        cuota.monto_esperado = nuevo_precio * (1.0 - descuento / 100.0)
+        actualizadas += 1
+
+    db.commit()
+    return {"actualizadas": actualizadas, "nuevo_precio": nuevo_precio}
+
 @router.delete("/cursos/{curso_id}")
 def delete_curso(
     curso_id: uuid.UUID,
