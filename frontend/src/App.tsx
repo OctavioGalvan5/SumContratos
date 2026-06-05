@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { 
   Bell, Home, FileText, PlusCircle, Calendar as CalendarIcon, Tags, Menu, X,
   BookOpen, Users, UserCheck, ClipboardList, DollarSign, BarChart3, CalendarRange
@@ -84,98 +83,98 @@ function App() {
 
         {/* Sidebar */}
         <aside className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col
+          fixed inset-y-0 left-0 z-50 w-64 bg-brand-teal text-white border-r border-brand-teal-mid flex flex-col
           transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           md:relative md:translate-x-0 md:flex shrink-0
         `}>
-          <div className="h-16 flex items-center justify-between border-b border-slate-200 px-4">
-            <h1 className="text-sm font-extrabold text-brand-teal tracking-wider uppercase leading-tight">Caja de Abogados</h1>
-            <button onClick={closeSidebar} className="md:hidden p-1 rounded hover:bg-slate-100">
-              <X className="w-5 h-5 text-slate-500" />
+          <div className="h-16 flex items-center justify-between border-b border-brand-teal-mid px-4">
+            <h1 className="text-sm font-black text-white tracking-wider uppercase leading-tight">Caja de Abogados</h1>
+            <button onClick={closeSidebar} className="md:hidden p-1 rounded hover:bg-white/10 text-white/80">
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
           
           <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
             {/* Sección Contratos */}
             <div>
-              <div className="px-3 mb-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <div className="px-3 mb-2.5 text-[10px] font-bold text-teal-200/50 uppercase tracking-widest">
                 📋 Contratos
               </div>
               <div className="space-y-1">
-                <Link to="/" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <Home className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Inicio Contratos</span>
-                </Link>
-                <Link to="/contratos" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <FileText className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Listado</span>
-                </Link>
-                <Link to="/nuevo" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <PlusCircle className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Nuevo Contrato</span>
-                </Link>
-                <Link to="/calendario" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <CalendarIcon className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Calendario</span>
-                </Link>
-                <Link to="/categorias" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <Tags className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Categorías</span>
-                </Link>
+                <NavLink to="/" onClick={closeSidebar} className="nav-link-custom">
+                  <Home />
+                  <span>Inicio Contratos</span>
+                </NavLink>
+                <NavLink to="/contratos" onClick={closeSidebar} className="nav-link-custom">
+                  <FileText />
+                  <span>Listado</span>
+                </NavLink>
+                <NavLink to="/nuevo" onClick={closeSidebar} className="nav-link-custom">
+                  <PlusCircle />
+                  <span>Nuevo Contrato</span>
+                </NavLink>
+                <NavLink to="/calendario" onClick={closeSidebar} className="nav-link-custom">
+                  <CalendarIcon />
+                  <span>Calendario</span>
+                </NavLink>
+                <NavLink to="/categorias" onClick={closeSidebar} className="nav-link-custom">
+                  <Tags />
+                  <span>Categorías</span>
+                </NavLink>
               </div>
             </div>
 
             {/* Sección SUM */}
             <div>
-              <div className="px-3 mb-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <div className="px-3 mb-2.5 text-[10px] font-bold text-teal-200/50 uppercase tracking-widest">
                 🏛️ Gestión SUM
               </div>
               <div className="space-y-1">
-                <Link to="/sum" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <Home className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Dashboard SUM</span>
-                </Link>
-                <Link to="/sum/cursos" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <BookOpen className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Cursos</span>
-                </Link>
-                <Link to="/sum/horarios" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <CalendarIcon className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Horario Semanal</span>
-                </Link>
-                <Link to="/sum/personas" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <Users className="w-4 h-4 mr-3 shrink-0 text-slate-455" />
-                  <span className="font-semibold">Personas</span>
-                </Link>
-                <Link to="/sum/inscripciones" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <UserCheck className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Inscripciones</span>
-                </Link>
-                <Link to="/sum/asistencia" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <ClipboardList className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Asistencia del Día</span>
-                </Link>
-                <Link to="/sum/pagos" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <DollarSign className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Pagos y Cuotas</span>
-                </Link>
-                <Link to="/sum/reportes" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <BarChart3 className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Reportes y Liq.</span>
-                </Link>
-                <Link to="/sum/feriados" onClick={closeSidebar} className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-650 rounded-lg transition-colors">
-                  <CalendarRange className="w-4 h-4 mr-3 shrink-0 text-slate-450" />
-                  <span className="font-semibold">Feriados</span>
-                </Link>
+                <NavLink to="/sum" onClick={closeSidebar} className="nav-link-custom" end>
+                  <Home />
+                  <span>Dashboard SUM</span>
+                </NavLink>
+                <NavLink to="/sum/cursos" onClick={closeSidebar} className="nav-link-custom">
+                  <BookOpen />
+                  <span>Cursos</span>
+                </NavLink>
+                <NavLink to="/sum/horarios" onClick={closeSidebar} className="nav-link-custom">
+                  <CalendarIcon />
+                  <span>Horario Semanal</span>
+                </NavLink>
+                <NavLink to="/sum/personas" onClick={closeSidebar} className="nav-link-custom">
+                  <Users />
+                  <span>Personas</span>
+                </NavLink>
+                <NavLink to="/sum/inscripciones" onClick={closeSidebar} className="nav-link-custom">
+                  <UserCheck />
+                  <span>Inscripciones</span>
+                </NavLink>
+                <NavLink to="/sum/asistencia" onClick={closeSidebar} className="nav-link-custom">
+                  <ClipboardList />
+                  <span>Asistencia del Día</span>
+                </NavLink>
+                <NavLink to="/sum/pagos" onClick={closeSidebar} className="nav-link-custom">
+                  <DollarSign />
+                  <span>Pagos y Cuotas</span>
+                </NavLink>
+                <NavLink to="/sum/reportes" onClick={closeSidebar} className="nav-link-custom">
+                  <BarChart3 />
+                  <span>Reportes y Liq.</span>
+                </NavLink>
+                <NavLink to="/sum/feriados" onClick={closeSidebar} className="nav-link-custom">
+                  <CalendarRange />
+                  <span>Feriados</span>
+                </NavLink>
               </div>
             </div>
           </nav>
           
-          <div className="p-4 border-t border-slate-200 print:hidden">
+          <div className="p-4 border-t border-brand-teal-mid print:hidden">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center px-4 py-2 text-slate-500 hover:bg-red-50 hover:text-red-650 rounded-lg transition-colors text-sm font-semibold cursor-pointer"
+              className="w-full flex items-center px-4 py-2 text-teal-100 hover:bg-brand-red hover:text-white rounded-lg transition-colors text-sm font-semibold cursor-pointer"
             >
               Cerrar Sesión
             </button>

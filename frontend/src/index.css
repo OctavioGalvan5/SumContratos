@@ -1,19 +1,56 @@
 @import "tailwindcss";
 
 @theme {
+  /* Caja de Abogados Brand Teal: #0C4566, Brand Teal Mid: #125E85, Brand Teal Dim: #F0F5F8 */
+  --color-teal-50: #F0F5F8;
+  --color-teal-100: #DCE7EE;
+  --color-teal-200: #B9CEDB;
+  --color-teal-300: #8EB1C4;
+  --color-teal-400: #5D8FAF;
+  --color-teal-500: #125E85;
+  --color-teal-600: #0C4566;
+  --color-teal-700: #09344D;
+  --color-teal-800: #072B3E;
+  --color-teal-900: #051D2A;
+  --color-teal-950: #030F17;
+
+  /* Primary colors alias of brand teal */
   --color-primary-50: #F0F5F8;
   --color-primary-100: #DCE7EE;
+  --color-primary-200: #B9CEDB;
+  --color-primary-300: #8EB1C4;
+  --color-primary-400: #5D8FAF;
   --color-primary-500: #125E85;
   --color-primary-600: #0C4566;
   --color-primary-700: #09344D;
 
+  /* Brand Red: #A61B1B, Brand Red Dim: #FDF2F2 */
+  --color-red-50: #FDF2F2;
+  --color-red-100: #FDE2E2;
+  --color-red-200: #FCA5A5;
+  --color-red-300: #F87171;
+  --color-red-400: #EF4444;
+  --color-red-500: #DC2626;
+  --color-red-600: #A61B1B;
+  --color-red-700: #821010;
+
+  /* Specific color tokens for brand */
   --color-brand-teal: #0C4566;
   --color-brand-teal-dim: #F0F5F8;
   --color-brand-teal-mid: #125E85;
   --color-brand-red: #A61B1B;
   --color-brand-red-dim: #FDF2F2;
   --color-bg-gray: #F4F6F8;
-  
+
+  /* Custom intermediate shades requested or used in code */
+  --color-primary-650: #0C4566;
+  --color-teal-650: #0C4566;
+  --color-red-650: #A61B1B;
+  --color-blue-650: #1D4ED8;
+  --color-purple-650: #6D28D9;
+  --color-emerald-650: #047857;
+  --color-slate-650: #334155;
+
   --radius-lg: 12px;
 }
 
@@ -21,8 +58,9 @@
   body {
     @apply bg-bg-gray text-gray-900 antialiased;
     font-family: 'Inter', -apple-system, sans-serif;
-    background-image: radial-gradient(circle at 1px 1px, rgba(12, 69, 102, 0.05) 1px, transparent 0);
-    background-size: 24px 24px;
+    /* Dot grid matching valuaciones exactly */
+    background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.035) 1px, transparent 0);
+    background-size: 28px 28px;
   }
   
   /* Animación de entrada de tarjetas y filas */
@@ -31,8 +69,45 @@
   }
 }
 
+/* Custom Sidebar Link styling for dark-teal sidebar */
+.nav-link-custom {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  transition: all 150ms ease-out;
+  font-weight: 600;
+  color: rgba(240, 245, 248, 0.8); /* teal-100 equivalent */
+  text-decoration: none;
+}
+.nav-link-custom svg {
+  color: #8EB1C4; /* teal-300 equivalent */
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: color 150ms ease-out;
+}
+.nav-link-custom:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.nav-link-custom:hover svg {
+  color: #ffffff;
+}
+.nav-link-custom.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.nav-link-custom.active svg {
+  color: #ffffff;
+}
+
 @keyframes card-in {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+
 
