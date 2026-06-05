@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./caja_contratos_v3.db"
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/postgres"
     MINIO_URL: str = "localhost:9000"
     MINIO_ACCESS_KEY: str = "minioadmin"
     MINIO_SECRET_KEY: str = "minioadmin"

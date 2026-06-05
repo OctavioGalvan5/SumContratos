@@ -1,31 +1,38 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #f0fdfa;
-  --color-primary-100: #ccfbf1;
-  --color-primary-500: #14b8a6;
-  --color-primary-600: #0d9488;
-  --color-primary-700: #0f766e;
+  --color-primary-50: #F0F5F8;
+  --color-primary-100: #DCE7EE;
+  --color-primary-500: #125E85;
+  --color-primary-600: #0C4566;
+  --color-primary-700: #09344D;
+
+  --color-brand-teal: #0C4566;
+  --color-brand-teal-dim: #F0F5F8;
+  --color-brand-teal-mid: #125E85;
+  --color-brand-red: #A61B1B;
+  --color-brand-red-dim: #FDF2F2;
+  --color-bg-gray: #F4F6F8;
+  
+  --radius-lg: 12px;
 }
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-bg-gray text-gray-900 antialiased;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-image: radial-gradient(circle at 1px 1px, rgba(12, 69, 102, 0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  
+  /* Animación de entrada de tarjetas y filas */
+  .animate-card-fade {
+    animation: card-in 350ms cubic-bezier(0.23, 1, 0.32, 1) both;
   }
 }
 
-/* Custom Scrollbar for better UI */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+

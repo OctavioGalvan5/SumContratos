@@ -2,9 +2,6 @@ from pydantic import BaseModel, UUID4
 from datetime import date, datetime
 from typing import Optional, List
 
-class LoginRequest(BaseModel):
-    password: str
-
 class CategoriaBase(BaseModel):
     nombre: str
 
